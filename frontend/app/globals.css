@@ -1,0 +1,94 @@
+@import "tailwindcss";
+
+/* ── Design System Tokens ────────────────────── */
+:root {
+  --font-display: 'Space Grotesk', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --bg-deep: #0A0A0F;
+  --bg-card: #12121A;
+  --text-primary: #F0F4FF;
+  --text-muted: #6B7280;
+  --accent-blue: #0066CC;
+  --accent-cyan: #00B4D8;
+}
+
+/* ── Base ─────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+}
+
+/* ── Typography Utility Classes ──────────────── */
+.font-display { font-family: var(--font-display); }
+.font-body { font-family: var(--font-body); }
+
+/* ── Custom Scrollbar ────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-deep); }
+::-webkit-scrollbar-thumb { background: #1a1a2e; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #252540; }
+
+/* ── Selection ───────────────────────────────── */
+::selection {
+  background: rgba(0, 102, 204, 0.3);
+  color: var(--text-primary);
+}
+
+/* ── Subtle noise texture overlay ────────────── */
+.noise-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  opacity: 0.015;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+}
+
+/* ── Apple Music Style Cinematic Background ────────────── */
+@keyframes ambient-glow {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.05) rotate(1.5deg); }
+}
+
+.gradient-bg {
+  position: fixed;
+  inset: -20%; /* Expanded to allow smooth blurred edges and scale animation */
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(90px); /* Massive glassmorphism blur */
+  background:
+    radial-gradient(ellipse 60% 60% at 15% 20%, rgba(74, 0, 224, 0.15), transparent 50%),
+    radial-gradient(ellipse 60% 60% at 85% 85%, rgba(0, 102, 204, 0.18), transparent 50%),
+    radial-gradient(ellipse 70% 50% at 100% 5%, rgba(0, 180, 216, 0.1), transparent 60%),
+    radial-gradient(ellipse 50% 70% at 5% 95%, rgba(20, 0, 80, 0.3), transparent 50%);
+  animation: ambient-glow 18s ease-in-out infinite alternate;
+}
+
+/* ── Empty state diamond animation ───────────── */
+@keyframes float-diamond {
+  0%, 100% { transform: rotate(45deg) translateY(0px); }
+  50% { transform: rotate(45deg) translateY(-8px); }
+}
+
+.diamond-float {
+  animation: float-diamond 3s ease-in-out infinite;
+}
+
+/* ── Skeleton shimmer ────────────────────────── */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255,255,255,0.04) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
