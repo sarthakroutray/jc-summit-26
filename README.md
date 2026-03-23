@@ -77,13 +77,7 @@ A premium, real-time question display system developed for **ACM MUJ** events. B
 
 ---
 
-## 📖 Architecture Guide
-
-For a detailed breakdown of the codebase, data flow, and database schema, please refer to the [Architecture & Codebase Guide](./architecture_and_codebase_guide.md).
-
----
 
 ## 🏆 Credits
 
 Developed by **ACM Student Chapter — Manipal University Jaipur**.
-Designed with **Taste-Skill** aesthetics for high-impact visual performance.
