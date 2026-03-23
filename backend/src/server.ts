@@ -66,6 +66,6 @@ app.get('/', (_req, res) => {
 const server = http.createServer(app);
 initWebSocket(server);
 
-server.listen(Number(process.env.PORT) || 4000, () => {
-  console.log(`LiveCards backend running on port ${process.env.PORT || 4000}`);
+server.listen(Number(process.env.PORT) || 4000, '0.0.0.0', () => {
+  console.log(`LiveCards backend running on port ${process.env.PORT || 4000} (bind 0.0.0.0)`);
 });
