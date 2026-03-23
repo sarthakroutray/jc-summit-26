@@ -1,3 +1,5 @@
+// ── Existing types (kept for backward compatibility) ─────
+
 export interface Session {
   id: string;
   title: string;
@@ -17,7 +19,7 @@ export interface Question {
   created_at: string;
 }
 
-// WebSocket message types
+// WebSocket message types (legacy)
 export type WsMessageType =
   | 'new_question'
   | 'delete_question'
@@ -40,3 +42,35 @@ export interface WsMessage {
 }
 
 export type WsStatus = 'connecting' | 'open' | 'closed' | 'error';
+
+// ── New Voting System Types ──────────────────────────────
+
+export interface VoteQuestion {
+  id: string;
+  text: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export interface VoteOption {
+  id: string;
+  question_id: string;
+  text: string;
+  vote_count: number;
+}
+
+export interface ActiveQuestionResponse {
+  question: VoteQuestion | null;
+  options: VoteOption[];
+}
+
+export interface ResultsResponse {
+  question: VoteQuestion | null;
+  options: VoteOption[];
+}
+
+export interface QuestionWithOptions extends VoteQuestion {
+  options: VoteOption[];
+}
+
+export type ConnectionStatus = 'connected' | 'polling' | 'error';

@@ -69,9 +69,9 @@ export function QuestionCard({ question, index, isNew = false, onDelete }: Props
         }}
       />
 
-      <div className="relative p-5 sm:p-6">
+      <div className="relative p-4 sm:p-6 pb-10 sm:pb-6">
         {/* Card index badge */}
-        <span className="absolute top-4 right-4 text-[10px] font-mono text-white/15 tabular-nums">
+        <span className="absolute top-4 sm:top-5 right-4 sm:right-5 text-[10px] font-mono text-white/15 tabular-nums">
           #{String(index + 1).padStart(2, '0')}
         </span>
 
@@ -105,7 +105,7 @@ export function QuestionCard({ question, index, isNew = false, onDelete }: Props
           <motion.button
             whileTap={{ scale: 0.92 }}
             onClick={() => onDelete(question.id)}
-            className="absolute bottom-4 right-4 text-[10px] text-[#6B7280]/40 hover:text-red-400 transition-colors font-mono uppercase tracking-wider"
+            className="absolute bottom-4 sm:bottom-5 right-4 sm:right-5 text-[10px] text-[#6B7280]/40 hover:text-red-400 transition-colors font-mono uppercase tracking-wider"
           >
             Remove
           </motion.button>

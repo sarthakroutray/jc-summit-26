@@ -1,104 +1,132 @@
 'use client';
-import { Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { AcmHeader } from '../components/AcmHeader';
-import { SessionBar } from '../components/SessionBar';
-import { CardGrid } from '../components/CardGrid';
-import { useQuestions } from '../hooks/useQuestions';
-import { useWebSocket } from '../hooks/useWebSocket';
+import Image from 'next/image';
+import Link from 'next/link';
 
-function AudienceContent() {
-  const params = useSearchParams();
-  const sessionId = params.get('session') ||
-    process.env.NEXT_PUBLIC_DEFAULT_SESSION_ID || '';
+const ROUTES = [
+  {
+    href: '/vote',
+    title: 'Vote',
+    description: 'Cast your vote on the active question',
+    accent: '#0066CC',
+    icon: '🗳️',
+  },
+  {
+    href: '/dashboard',
+    title: 'Dashboard',
+    description: 'Live results with charts and analytics',
+    accent: '#00B4D8',
+    icon: '📊',
+  },
+  {
+    href: '/admin',
+    title: 'Admin',
+    description: 'Manage questions and control the session',
+    accent: '#8B5CF6',
+    icon: '⚙️',
+  },
+];
 
-  const { questions, isLoading, handleWsMessage } = useQuestions(sessionId);
-  const { status } = useWebSocket({ onMessage: handleWsMessage });
-
+export default function HomePage() {
   return (
     <div className="min-h-[100dvh] flex flex-col relative">
-      {/* Ambient gradient background */}
       <div className="gradient-bg" />
       <div className="noise-overlay" />
 
-      <AcmHeader status={status} />
-
-      <SessionBar
-        questionCount={questions.length}
-      />
-
-      {/* Card grid */}
-      <main className="flex-1 p-6 sm:p-8">
-        {isLoading ? (
-          /* Central Loading Screen */
+      {/* Header */}
+      <motion.header
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 28 }}
+        className="flex items-center justify-center px-4 sm:px-8 py-5 border-b border-white/[0.06]"
+        style={{ backdropFilter: 'blur(12px)' }}
+      >
+        <div className="flex items-center gap-3 sm:gap-4">
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex flex-col items-center justify-center h-[50vh] gap-6"
+            whileHover={{ scale: 1.05, rotate: 2 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            className="relative w-10 sm:w-12 h-10 sm:h-12 flex-shrink-0"
           >
-            <div className="relative flex items-center justify-center w-14 h-14">
-              <motion.div
-                animate={{ rotate: [45, 405] }}
-                transition={{ repeat: Infinity, duration: 3, ease: 'linear' }}
-                className="absolute inset-0 border-2 border-[#0066CC]/20 border-t-[#0066CC]/80 rounded-[4px]"
-              />
-              <motion.div
-                animate={{ rotate: [45, -315] }}
-                transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
-                className="absolute inset-2 border-[1.5px] border-[#00B4D8]/20 border-b-[#00B4D8]/80 rounded-[3px]"
-              />
-            </div>
-            <div className="text-center">
-              <p className="font-display text-lg text-[#6B7280]/80 tracking-tight">
-                Synchronizing...
-              </p>
-              <p className="text-[11px] font-mono text-[#6B7280]/30 mt-2 tracking-wider animate-pulse">
-                Establishing uplink
-              </p>
-            </div>
+            <Image
+              src="/acm-logo.png"
+              alt="ACM Logo"
+              width={48}
+              height={48}
+              className="object-contain drop-shadow-[0_0_12px_rgba(0,102,204,0.3)]"
+              priority
+            />
           </motion.div>
-        ) : questions.length === 0 ? (
-          /* Empty state */
+          <div className="flex flex-col">
+            <p className="text-[9px] sm:text-[10px] font-mono text-[#0066CC] tracking-[0.2em] sm:tracking-[0.25em] uppercase leading-none mb-1">
+              ACM — Manipal University Jaipur
+            </p>
+            <h1 className="font-display text-lg sm:text-xl font-bold text-[#F0F4FF] leading-none tracking-tight">
+              JC Summit — LiveCards
+            </h1>
+          </div>
+        </div>
+      </motion.header>
+
+      {/* Content */}
+      <main className="flex-1 flex items-center justify-center p-6 sm:p-8">
+        <div className="w-full max-w-md">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 25 }}
-            className="flex flex-col items-center justify-center h-[50vh] gap-5"
+            className="text-center mb-10"
           >
-            <div
-              className="w-14 h-14 border-2 border-[#0066CC]/20 diamond-float"
-              style={{ borderRadius: '4px' }}
-            />
-            <div className="text-center">
-              <p className="font-display text-lg text-[#6B7280]/80 tracking-tight">
-                Waiting for questions
-              </p>
-              <p className="text-[11px] font-mono text-[#6B7280]/30 mt-2 tracking-wider">
-                Questions will appear here in real-time
-              </p>
-            </div>
+            <h2 className="font-display text-3xl font-bold text-[#F0F4FF] tracking-tight mb-3">
+              Live Voting System
+            </h2>
+            <p className="text-sm text-[#6B7280]/80 font-body">
+              Select your destination
+            </p>
           </motion.div>
-        ) : (
-          <CardGrid questions={questions} />
-        )}
+
+          <div className="space-y-4">
+            {ROUTES.map((route, i) => (
+              <motion.div
+                key={route.href}
+                initial={{ opacity: 0, y: 20, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 25, delay: i * 0.08 }}
+              >
+                <Link href={route.href}>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="group rounded-2xl p-5 cursor-pointer transition-all duration-200"
+                    style={{
+                      background: '#12121A',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      borderLeftWidth: '3px',
+                      borderLeftColor: route.accent,
+                    }}
+                  >
+                    <div className="flex items-center gap-4">
+                      <span className="text-2xl">{route.icon}</span>
+                      <div>
+                        <p className="font-display text-lg font-bold text-[#F0F4FF] tracking-tight group-hover:text-white transition-colors">
+                          {route.title}
+                        </p>
+                        <p className="text-[11px] text-[#6B7280]/60 font-mono tracking-wider mt-0.5">
+                          {route.description}
+                        </p>
+                      </div>
+                      <svg className="ml-auto w-5 h-5 text-[#6B7280]/30 group-hover:text-[#6B7280] transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
+                  </motion.div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </main>
 
-      {/* Bottom accent line */}
       <div className="h-[1px] bg-gradient-to-r from-transparent via-[#0066CC]/15 to-transparent" />
     </div>
-  );
-}
-
-export default function AudiencePage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-[100dvh] flex items-center justify-center">
-        <div className="w-8 h-8 border-2 border-[#0066CC]/30 border-t-[#0066CC] rounded-full animate-spin" />
-      </div>
-    }>
-      <AudienceContent />
-    </Suspense>
   );
 }

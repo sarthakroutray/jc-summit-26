@@ -43,15 +43,15 @@ export function AcmHeader({ status }: { status?: WsStatus } = {}) {
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ type: 'spring', stiffness: 200, damping: 28 }}
-      className="flex items-center justify-between px-8 py-5 border-b border-white/[0.06]"
+      className="flex items-center justify-between px-4 sm:px-8 py-4 sm:py-5 border-b border-white/[0.06]"
       style={{ backdropFilter: 'blur(12px)' }}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4">
         {/* ACM Logo */}
         <motion.div
           whileHover={{ scale: 1.05, rotate: 2 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          className="relative w-12 h-12 flex-shrink-0"
+          className="relative w-10 sm:w-12 h-10 sm:h-12 flex-shrink-0"
         >
           <Image
             src="/acm-logo.png"
@@ -64,10 +64,10 @@ export function AcmHeader({ status }: { status?: WsStatus } = {}) {
         </motion.div>
 
         <div className="flex flex-col">
-          <p className="text-[10px] font-mono text-[#0066CC] tracking-[0.25em] uppercase leading-none mb-1">
+          <p className="text-[9px] sm:text-[10px] font-mono text-[#0066CC] tracking-[0.2em] sm:tracking-[0.25em] uppercase leading-none mb-1">
             ACM — Manipal University Jaipur
           </p>
-          <h1 className="font-display text-xl font-bold text-[#F0F4FF] leading-none tracking-tight">
+          <h1 className="font-display text-lg sm:text-xl font-bold text-[#F0F4FF] leading-none tracking-tight">
             <ScrambleText text="JC Summit" />
           </h1>
         </div>
