@@ -23,6 +23,10 @@ export default function AdminPage() {
   // Questions list
   const [questions, setQuestions] = useState<QuestionWithOptions[]>([]);
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true);
+  const [pollingEnabled, setPollingEnabled] = useState(true);
+  const [isLoadingPolling, setIsLoadingPolling] = useState(true);
+  const [isUpdatingPolling, setIsUpdatingPolling] = useState(false);
+  const [pollingMessage, setPollingMessage] = useState<string | null>(null);
 
   const fetchQuestions = useCallback(async () => {
     try {
@@ -42,6 +46,58 @@ export default function AdminPage() {
   useEffect(() => {
     if (isAdmin) fetchQuestions();
   }, [isAdmin, fetchQuestions]);
+
+  const fetchPollingStatus = useCallback(async () => {
+    setIsLoadingPolling(true);
+    try {
+      const res = await fetch('/api/admin/polling', {
+        headers: getAuthHeader(),
+      });
+      if (!res.ok) return;
+      const data: { enabled?: boolean } = await res.json();
+      setPollingEnabled(!!data.enabled);
+    } catch {
+      // silent
+    } finally {
+      setIsLoadingPolling(false);
+    }
+  }, [getAuthHeader]);
+
+  useEffect(() => {
+    if (isAdmin) fetchPollingStatus();
+  }, [isAdmin, fetchPollingStatus]);
+
+  const togglePolling = async () => {
+    setIsUpdatingPolling(true);
+    setPollingMessage(null);
+
+    try {
+      const nextEnabled = !pollingEnabled;
+      const res = await fetch('/api/admin/polling', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeader(),
+        },
+        body: JSON.stringify({ enabled: nextEnabled }),
+      });
+
+      const data: { enabled?: boolean; error?: string } = await res.json();
+      if (!res.ok) {
+        setPollingMessage(data.error || 'Failed to update polling status');
+        return;
+      }
+
+      const enabled = !!data.enabled;
+      setPollingEnabled(enabled);
+      setPollingMessage(enabled ? 'Polling enabled' : 'Polling paused to reduce bandwidth');
+      setTimeout(() => setPollingMessage(null), 2500);
+    } catch {
+      setPollingMessage('Network error while updating polling status');
+    } finally {
+      setIsUpdatingPolling(false);
+    }
+  };
 
   // ── Sign in ──
   const handleLogin = async (e: React.FormEvent) => {
@@ -280,6 +336,57 @@ export default function AdminPage() {
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
               </svg>
               Sign out
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Polling Control */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 25 }}
+          className="rounded-2xl overflow-hidden mb-8"
+          style={{
+            background: '#12121A',
+            border: '1px solid rgba(255,255,255,0.06)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
+          }}
+        >
+          <div className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h2 className="text-[10px] font-mono text-[#6B7280]/60 uppercase tracking-[0.2em] mb-2">
+                Polling Control
+              </h2>
+              <p className="text-sm text-[#F0F4FF]/80">
+                {isLoadingPolling
+                  ? 'Checking current polling status...'
+                  : pollingEnabled
+                    ? 'Polling is ON (live updates, higher bandwidth)'
+                    : 'Polling is OFF (clients check infrequently to save bandwidth)'}
+              </p>
+              {pollingMessage && (
+                <p className="text-[11px] font-mono text-[#00B4D8] tracking-wider mt-2">{pollingMessage}</p>
+              )}
+            </div>
+
+            <motion.button
+              whileTap={{ scale: 0.97, y: 1 }}
+              onClick={togglePolling}
+              disabled={isLoadingPolling || isUpdatingPolling}
+              className="w-full sm:w-auto px-6 py-2.5 text-white text-[11px] font-display font-semibold
+                         rounded-xl transition-all duration-200 uppercase tracking-wider
+                         disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{
+                background: pollingEnabled
+                  ? 'linear-gradient(135deg, #F59E0B, #D97706)'
+                  : 'linear-gradient(135deg, #10B981, #059669)',
+              }}
+            >
+              {isUpdatingPolling
+                ? 'Updating...'
+                : pollingEnabled
+                  ? 'Pause Polling'
+                  : 'Enable Polling'}
             </motion.button>
           </div>
         </motion.div>

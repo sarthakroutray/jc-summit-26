@@ -2,6 +2,14 @@ import { NextResponse } from 'next/server';
 import { supabase } from '../../../lib/supabase';
 
 export async function GET() {
+  // Read persisted polling toggle; default to enabled.
+  const { data: pollingRow } = await supabase
+    .from('polling_config')
+    .select('enabled')
+    .eq('id', 1)
+    .maybeSingle();
+  const polling_enabled = pollingRow?.enabled ?? true;
+
   // Find the active question
   const { data: question, error: qErr } = await supabase
     .from('questions')
@@ -15,7 +23,7 @@ export async function GET() {
   }
 
   if (!question) {
-    return NextResponse.json({ question: null, options: [] });
+    return NextResponse.json({ question: null, options: [], polling_enabled });
   }
 
   // Get options for the active question
@@ -29,5 +37,5 @@ export async function GET() {
     return NextResponse.json({ error: oErr.message }, { status: 500 });
   }
 
-  return NextResponse.json({ question, options: options || [] });
+  return NextResponse.json({ question, options: options || [], polling_enabled });
 }

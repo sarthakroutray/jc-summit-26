@@ -14,6 +14,7 @@ DROP TABLE IF EXISTS votes   CASCADE;
 DROP TABLE IF EXISTS options CASCADE;
 DROP TABLE IF EXISTS questions CASCADE;
 DROP TABLE IF EXISTS admin_users CASCADE;
+DROP TABLE IF EXISTS polling_config CASCADE;
 
 
 -- ── 3. Admin Users Table ─────────────────────────────────────
@@ -27,6 +28,20 @@ CREATE TABLE admin_users (
 
 COMMENT ON TABLE admin_users IS
   'Supabase Auth users who are allowed to manage questions.';
+
+
+-- ── 3b. Polling Config Table ───────────────────────────────
+-- Single-row table controlling whether clients should use
+-- high-frequency polling or bandwidth-saving idle polling.
+CREATE TABLE polling_config (
+  id         INTEGER PRIMARY KEY CHECK (id = 1),
+  enabled    BOOLEAN     NOT NULL DEFAULT true,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+INSERT INTO polling_config (id, enabled)
+VALUES (1, true)
+ON CONFLICT (id) DO NOTHING;
 
 
 -- ── 4. Questions Table ───────────────────────────────────────
@@ -198,6 +213,7 @@ ALTER TABLE questions  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE options    ENABLE ROW LEVEL SECURITY;
 ALTER TABLE votes      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE admin_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE polling_config ENABLE ROW LEVEL SECURITY;
 
 -- ── Questions policies ───────────────────────────────────────
 -- Anyone can read questions (public voting page uses the API)
@@ -282,6 +298,20 @@ CREATE POLICY "admin_users: self read"
   ON admin_users FOR SELECT
   TO authenticated
   USING ( id = auth.uid() );
+
+-- ── Polling config policies ─────────────────────────────────
+-- Public can read whether polling is enabled.
+CREATE POLICY "polling_config: public read"
+  ON polling_config FOR SELECT
+  USING (true);
+
+-- Only admins can update polling mode.
+CREATE POLICY "polling_config: admin update"
+  ON polling_config FOR UPDATE
+  TO authenticated
+  USING (
+    EXISTS (SELECT 1 FROM admin_users WHERE id = auth.uid())
+  );
 
 
 -- ── 10. Grant service-role bypass (used by API routes) ───────

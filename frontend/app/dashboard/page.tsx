@@ -106,7 +106,7 @@ function PieChart({ options, size = 280 }: { options: VoteOption[]; size?: numbe
 }
 
 export default function DashboardPage() {
-  const { question, options, isLoading } = useResults();
+  const { question, options, pollingEnabled, isLoading } = useResults();
 
   const totalVotes = options.reduce((sum, o) => sum + o.vote_count, 0);
   const maxVotes = Math.max(...options.map(o => o.vote_count), 0);
@@ -151,11 +151,18 @@ export default function DashboardPage() {
           <div className="px-3 py-1.5 rounded-full border border-white/[0.06] bg-white/[0.02] flex items-center gap-2">
             <motion.div
               className="w-2 h-2 rounded-full"
-              style={{ backgroundColor: '#10B981', boxShadow: '0 0 8px rgba(16,185,129,0.4)' }}
-              animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                backgroundColor: pollingEnabled ? '#10B981' : '#F59E0B',
+                boxShadow: pollingEnabled
+                  ? '0 0 8px rgba(16,185,129,0.4)'
+                  : '0 0 8px rgba(245,158,11,0.35)',
+              }}
+              animate={pollingEnabled ? { scale: [1, 1.4, 1], opacity: [1, 0.5, 1] } : { scale: 1, opacity: 1 }}
+              transition={pollingEnabled ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
             />
-            <span className="text-[10px] font-mono text-[#6B7280] tracking-wider uppercase">Live</span>
+            <span className="text-[10px] font-mono text-[#6B7280] tracking-wider uppercase">
+              {pollingEnabled ? 'Live' : 'Paused'}
+            </span>
           </div>
         </div>
       </motion.header>
