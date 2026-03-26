@@ -2,11 +2,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { ActiveQuestionResponse, VoteQuestion, VoteOption } from '../types';
 
-const POLL_INTERVAL = 2500; // 2.5 seconds
+const ACTIVE_POLL_INTERVAL = 2500; // 2.5 seconds when enabled
+const IDLE_POLL_INTERVAL = 30000; // 30 seconds when disabled
 
 export function useActiveQuestion() {
   const [question, setQuestion] = useState<VoteQuestion | null>(null);
   const [options, setOptions] = useState<VoteOption[]>([]);
+  const [pollingEnabled, setPollingEnabled] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -21,6 +23,7 @@ export function useActiveQuestion() {
       if (isMounted.current) {
         setQuestion(data.question);
         setOptions(data.options);
+        setPollingEnabled(data.polling_enabled ?? true);
         setError(null);
         setIsLoading(false);
       }
@@ -35,7 +38,9 @@ export function useActiveQuestion() {
   useEffect(() => {
     isMounted.current = true;
     fetchActiveQuestion();
-    intervalRef.current = setInterval(fetchActiveQuestion, POLL_INTERVAL);
+
+    const intervalMs = pollingEnabled ? ACTIVE_POLL_INTERVAL : IDLE_POLL_INTERVAL;
+    intervalRef.current = setInterval(fetchActiveQuestion, intervalMs);
 
     return () => {
       isMounted.current = false;
@@ -43,7 +48,7 @@ export function useActiveQuestion() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [fetchActiveQuestion]);
+  }, [fetchActiveQuestion, pollingEnabled]);
 
-  return { question, options, isLoading, error, refetch: fetchActiveQuestion };
+  return { question, options, pollingEnabled, isLoading, error, refetch: fetchActiveQuestion };
 }

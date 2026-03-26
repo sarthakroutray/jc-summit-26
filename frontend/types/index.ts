@@ -19,7 +19,7 @@ export interface Question {
   created_at: string;
 }
 
-// WebSocket message types (legacy)
+// Legacy message types used by retained admin UI components
 export type WsMessageType =
   | 'new_question'
   | 'delete_question'
@@ -62,11 +62,13 @@ export interface VoteOption {
 export interface ActiveQuestionResponse {
   question: VoteQuestion | null;
   options: VoteOption[];
+  polling_enabled?: boolean;
 }
 
 export interface ResultsResponse {
   question: VoteQuestion | null;
   options: VoteOption[];
+  polling_enabled?: boolean;
 }
 
 export interface QuestionWithOptions extends VoteQuestion {

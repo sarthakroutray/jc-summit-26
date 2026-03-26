@@ -25,7 +25,7 @@ function markVoted(questionId: string) {
 }
 
 export default function VotePage() {
-  const { question, options, isLoading: isQuestionLoading } = useActiveQuestion();
+  const { question, options, pollingEnabled, isLoading: isQuestionLoading } = useActiveQuestion();
   const [votedQuestions, setVotedQuestions] = useState<Set<string>>(new Set());
   const [isVoting, setIsVoting] = useState(false);
   const [voteError, setVoteError] = useState<string | null>(null);
@@ -203,11 +203,18 @@ export default function VotePage() {
           <div className="flex items-center gap-1.5 sm:gap-2">
             <motion.div
               className="w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full"
-              style={{ backgroundColor: '#10B981', boxShadow: '0 0 8px rgba(16,185,129,0.4)' }}
-              animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
-              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+              style={{
+                backgroundColor: pollingEnabled ? '#10B981' : '#F59E0B',
+                boxShadow: pollingEnabled
+                  ? '0 0 8px rgba(16,185,129,0.4)'
+                  : '0 0 8px rgba(245,158,11,0.35)',
+              }}
+              animate={pollingEnabled ? { scale: [1, 1.4, 1], opacity: [1, 0.5, 1] } : { scale: 1, opacity: 1 }}
+              transition={pollingEnabled ? { duration: 2, repeat: Infinity, ease: 'easeInOut' } : { duration: 0.2 }}
             />
-            <span className="text-[9px] sm:text-[10px] font-mono text-[#6B7280] tracking-wider uppercase">Polling</span>
+            <span className="text-[9px] sm:text-[10px] font-mono text-[#6B7280] tracking-wider uppercase">
+              {pollingEnabled ? 'Polling' : 'Polling Paused'}
+            </span>
           </div>
         </div>
       </motion.header>
